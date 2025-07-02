@@ -1,263 +1,149 @@
-import { Close as CloseIcon, ContactPhone, Dashboard, ExitToApp as ExitToAppIcon, FiveK, FourK, Image, ImageAspectRatio, ImportExport, Menu as MenuIcon, Message, OneK, SixK, ThreeK, TwoK } from "@mui/icons-material";
-import { Box, Drawer, Grid, IconButton, Stack, styled, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Link as LinkComponent, useLocation, useNavigate } from "react-router-dom";
-import { matBlack } from "./constants/color";
-import { server } from "../../server.js"
-import axios from "axios";
-import toast from "react-hot-toast";
+import { useState} from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+    FaTimes,
+    FaTachometerAlt,
+    FaBlog,
+    // FaSignOutAlt,
+} from 'react-icons/fa';
+// import axios from 'axios';
+// import toast from 'react-hot-toast';
+// import { server } from '../../server';
 
-
-
-const Link = styled(LinkComponent)`
-    text-decoration: none;
-    border-radius: 2rem;
-    padding: 1rem 2rem;
-    color: black;
-    &:hover {
-        color: rgba(0, 0, 0, 0.54)
-    }
-`;
-
-const adminTabs = [
+const navSections = [
     {
-        name: "Dashboard",
-        path: "/admin/dashboard",
-        icon: <Dashboard />
+        title: 'General',
+        items: [
+            { name: 'Dashboard', path: '/admin/dashboard', icon: <FaTachometerAlt /> },
+        ],
     },
     {
-        name: "Logo",
-        path: "/admin/logo",
-        icon: <Image />
+        title: 'Content',
+        items: [
+            { name: 'Blog Section', path: '/admin/blog-post', icon: <FaBlog /> },
+        ],
     },
-    {
-        name: "Banner",
-        path: "/admin/banner-management",
-        icon: <ImageAspectRatio />
-    },
-    {
-        name: "Contact",
-        path: "/admin/contact-management",
-        icon: <ContactPhone />
-    },
-
-    {
-        name: "Section-1",
-        path: "/admin/sectionone-management",
-        icon: <OneK />
-    },
-    {
-        name: "Section-2",
-        path: "/admin/sectiontwo-management",
-        icon: <TwoK />
-    },
-    {
-        name: "Section-3",
-        path: "/admin/sectionthree-management",
-        icon: <ThreeK />
-    },
-    {
-        name: "Section-4",
-        path: "/admin/sectionfour-management",
-        icon: <FourK />
-    },
-    {
-        name: "Section-5",
-        path: "/admin/sectionfive-management",
-        icon: <FiveK />
-    },
-    {
-        name: "Section-6",
-        path: "/admin/sectionsix-management",
-        icon: <SixK />
-    },
-
-    {
-        name: "Messages",
-        path: "/admin/users-management",
-        icon: <Message />
-    },
-    {
-        name: "Export",
-        path: "/admin/export-data",
-        icon: <ImportExport />
-    },
-]
-
+];
 
 const AdminLayout = ({ children }) => {
-    const [isMobile, setIsMobile] = useState(false);
-    const navigate = useNavigate();
-
-    const handleMobile = () => setIsMobile(!isMobile);
-    const handleClose = () => setIsMobile(false);
-
-
-
-    // if (!isAdmin) return <Navigate to={"/admin"} />
-
-    // Automatically logout if the token is expired
-    useEffect(() => {
-        const checkTokenExpiration = () => {
-            const expirationTime = localStorage.getItem("token-expiration");
-            const currentTime = new Date().getTime();
-
-            // If token is expired
-            if (expirationTime && currentTime >= expirationTime) {
-                toast.error("Your session has expired. Please log in again.");
-                logout(true); // Pass true to avoid the "Logged out successfully" message
-            }
-        };
-
-        // Check expiration immediately when the component mounts
-        checkTokenExpiration();
-
-        // Check every 30 seconds for token expiration without refresh
-        const intervalId = setInterval(checkTokenExpiration, 30000); // Adjust the interval as needed
-
-        // Clear the interval when the component unmounts
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, [navigate]);
-
-
-    const logout = async (isExpired = false) => {
-        try {
-            // Call the backend logout API to clear any server-side session
-            await axios.get(`${server}/admin/logout`, { withCredentials: true });
-
-            // Remove token from localStorage and cookies
-            localStorage.removeItem("Admin-Token");
-            localStorage.removeItem("token-expiration");
-
-            // Only show "Logged out successfully" if it's not a session expiration
-            if (!isExpired) {
-                toast.success("Logged out successfully");
-            }
-
-            // Redirect to login
-            navigate("/admin");
-        } catch (error) {
-            console.error("Error logging out:", error);
-            toast.error("Failed to log out. Please try again.");
-        }
-    };
-
-    return (
-        <Grid container minHeight={"100vh"}>
-            <Box sx={{
-                display: { xs: "block", md: "none" },
-                position: "fixed",
-                right: "1rem",
-                top: "1rem",
-            }}>
-                <IconButton onClick={handleMobile}>
-                    {
-                        isMobile ? <CloseIcon /> : <MenuIcon />
-                    }
-                </IconButton>
-            </Box>
-
-            <Grid item md={4} lg={3} sx={{ display: { xs: "none", md: "block" } }}>
-                <Sidebar />
-            </Grid>
-
-            <Grid item md={8} lg={9} xs={12} sx={{ bgcolor: "#f5f5f5" }}>
-                {children}
-            </Grid>
-
-
-            <Drawer open={isMobile} onClose={handleClose}>
-                <Sidebar w="50vw" />
-            </Drawer>
-        </Grid>
-    )
-}
-
-
-const Sidebar = ({ w = "100%" }) => {
-
+    const [open, setOpen] = useState(false);
+    // const navigate = useNavigate();
     const location = useLocation();
-    const navigate = useNavigate()
 
+    // Auto-logout
+    // useEffect(() => {
+    //     const checkExpiry = () => {
+    //         const exp = localStorage.getItem('token-expiration');
+    //         if (exp && Date.now() >= +exp) {
+    //             toast.error('Session expired. Logging out.');
+    //             handleLogout(true);
+    //         }
+    //     };
+    //     checkExpiry();
+    //     const id = setInterval(checkExpiry, 30000);
+    //     return () => clearInterval(id);
+    // }, []);
 
-
-    const logoutHandler = async () => {
-        try {
-            await axios.get(`${server}/admin/logout`, { withCredentials: true });
-            localStorage.removeItem("Admin-Token");
-            localStorage.removeItem("token-expiration");
-
-
-            toast.success("Logged out successfully");
-            navigate("/admin");
-        } catch (error) {
-            console.error("Error logging out:", error);
-            toast.error("Failed to log out");
-        }
-    };
+    // const handleLogout = async (expired = false) => {
+    //     try {
+    //         console.log('Logging out...'); // <--- add this
+    //         await axios.get(`${server}/admin/logout`, { withCredentials: true });
+    //     } catch (err) {
+    //         console.error('Logout error:', err);
+    //     }
+    //     localStorage.removeItem('Admin-Token');
+    //     localStorage.removeItem('token-expiration');
+    //     if (!expired) toast.success('Logged out successfully');
+    //     navigate('/admin');
+    // };
 
     return (
-        <Stack width={w} direction={"column"} p={"3rem"} spacing={"3rem"}>
-            <Typography variant="h5" textTransform={"uppercase"}>Admin</Typography>
-
-            <Stack spacing={"0rem"} position={"fixed"}>
-                {adminTabs.map((tab) => (
-                    <Link key={tab.path} to={tab.path}
-                        sx={
-                            location.pathname === tab.path && {
-                                bgcolor: matBlack,
-                                // padding: "1rem",
-                                color: "white",
-                                ":hover": { color: "white" },
-                            }
-                        }
+        <div className="flex h-screen bg-gray-100">
+            {/* Sidebar */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-30 w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white shadow-lg transform
+        ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}
+            >
+                <div className="flex items-center justify-between px-6 py-4 border-b border-blue-700">
+                    <h2 className="text-xl font-bold">Admin</h2>
+                    <button className="md:hidden focus:outline-none" onClick={() => setOpen(false)}>
+                        <FaTimes size={20} />
+                    </button>
+                </div>
+                <nav className="mt-6 px-4">
+                    {navSections.map((section) => (
+                        <div key={section.title} className="mb-6">
+                            <p className="px-3 text-xs uppercase tracking-wider text-blue-300">
+                                {section.title}
+                            </p>
+                            <div className="mt-2 space-y-1">
+                                {section.items.map((item) => {
+                                    const active = location.pathname === item.path;
+                                    return (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            className={
+                                                `flex items-center px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors
+                        ${active ? 'bg-blue-700 font-semibold' : ''}`
+                                            }
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            <span className="mr-3 text-lg">{item.icon}</span>
+                                            <span>{item.name}</span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </nav>
+                {/* <div className="absolute bottom-0 w-full px-4 pb-6">
+                    <button
+                        onClick={() => handleLogout(false)}
+                        className="w-full flex items-center px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white transition-colors"
                     >
+                        <FaSignOutAlt className="mr-3 text-lg" /> Logout
+                    </button>
+                </div> */}
+            </aside>
 
-                        <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}>
-                            {tab.icon}
-                            <Typography>{tab.name}</Typography>
-                        </Stack>
-                    </Link>
-                ))}
+            {/* Overlay for mobile */}
+            {open && <div className="fixed inset-0 bg-black opacity-50 z-20 md:hidden" onClick={() => setOpen(false)} />}
 
-                <Link onClick={logoutHandler}>
+            {/* Main content */}
+            <div className="flex flex-col flex-1 overflow-hidden md:ml-64">
+                {/* Header */}
+                {/* <header className="flex items-center justify-between bg-white shadow-sm px-6 py-4">
+                    <div className="flex items-center">
+                        <button className="md:hidden mr-4 text-gray-600 focus:outline-none" onClick={() => setOpen(true)}>
+                            <FaBars size={24} />
+                        </button>
+                        <h1 className="text-2xl font-semibold text-gray-800">Admin Dashboard</h1>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        <div className="relative">
+                            <button className="text-gray-600 focus:outline-none">
+                                <FaBell size={20} />
+                            </button>
+                            <span className="absolute -top-1 -right-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                                3
+                            </span>
+                        </div>
+                        <button className="flex items-center space-x-2 focus:outline-none">
+                            <FaUserCircle size={24} className="text-gray-600" />
+                            <span className="text-gray-700 font-medium">Admin</span>
+                        </button>
+                    </div>
+                </header> */}
 
-                    <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}>
-                        <ExitToAppIcon />
-                        <Typography>Logout</Typography>
-                    </Stack>
-                </Link>
+                {/* Content area */}
+                <main className="flex-1 overflow-y-auto bg-gray-500 pl-2">
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
+};
 
-            </Stack>
-        </Stack>
-    )
-}
-
-export default AdminLayout
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default AdminLayout;
