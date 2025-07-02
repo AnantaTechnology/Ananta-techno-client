@@ -7,6 +7,8 @@ import project3 from "../../../assets/Projects/project3.png";
 import project4 from "../../../assets/Projects/project7.png";
 import project5 from "../../../assets/Projects/project8.png";
 import project6 from "../../../assets/Projects/project9.png";
+import project7 from "../../../assets/Projects/project10.png";
+import project77 from "../../../assets/Projects/pro10.png";
 import SEO from "../../../Components/SEO";
 
 const projectsData = [
@@ -16,6 +18,7 @@ const projectsData = [
     description:
       "A cutting-edge analytics platform powered by AI models and advanced algorithms, delivering actionable insights with immersive visual storytelling.",
     image: project1,
+
     tags: ["AWS", "React Js", "MongoDb", "Node Js", "Express Js", "Redux"],
     webapp: "https://my.agrospace.io/",
     details: `
@@ -45,7 +48,8 @@ const projectsData = [
     title: "E-Commerce Platform",
     description:
       "An elegant e-commerce website offering premium wellness and lifestyle products, combining sleek design with seamless functionality.",
-    image: project3,
+    image: project7,
+    images: project77,
     tags: [
       "Redis",
       "AWS",
@@ -55,7 +59,7 @@ const projectsData = [
       "Express Js",
       "Redux",
     ],
-    webapp: "https://quantumasync.onrender.com/",
+    // webapp: "https://quantumasync.onrender.com/",
     details: `
       This e-commerce platform focuses on providing a streamlined shopping experience.
       From seamless product browsing and quick checkout to detailed analytics and 
@@ -108,10 +112,11 @@ const projectsData = [
   },
   {
     id: 6,
-    title: "E-Commerce Admin Panel",
+    title: "E-Commerce",
     description:
       "A comprehensive admin dashboard for efficient e-commerce management, offering real-time analytics, order tracking, and inventory control.",
-    image: project6,
+    image: project3,
+    images: project6,
     tags: [
       "Redis",
       "AWS",
@@ -121,11 +126,11 @@ const projectsData = [
       "Express Js",
       "Redux",
     ],
-    webapp: "https://fem-cartel.vercel.app/admin/dashboard",
+    webapp: "",
     details: `
-      Built for store admins, this panel allows them to monitor daily sales, 
-      manage stock, and fulfill orders in real-time. The user-friendly interface 
-      and detailed reporting features ensure efficient store administration.
+     This e-commerce platform focuses on providing a streamlined shopping experience.
+      From seamless product browsing and quick checkout to detailed analytics and 
+      inventory management, it’s built for high performance and user satisfaction.
     `,
   },
 ];
@@ -198,6 +203,11 @@ const ProjectDetails = () => {
               src={project.image}
               alt={project.title}
               className="w-full h-auto object-cover"
+            />
+            <img
+              src={project.images}
+              alt={project.title}
+              className="w-full h-auto object-cover mt-8"
             />
           </motion.div>
 

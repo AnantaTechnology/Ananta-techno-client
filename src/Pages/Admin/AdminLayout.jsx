@@ -44,17 +44,40 @@ const AdminLayout = ({ children }) => {
         return () => clearInterval(id);
     }, []);
 
-    const handleLogout = async (expired = false) => {
-        try {
-            await axios.get(`${server}/admin/logout`, { withCredentials: true });
-        } catch (err) {
-            console.error('Logout error:', err);
-        }
-        localStorage.removeItem('Admin-Token');
-        localStorage.removeItem('token-expiration');
-        if (!expired) toast.success('Logged out successfully');
-        navigate('/admin');
-    };
+    // const handleLogout = async (expired = false) => {
+    //     try {
+    //         console.log('Logging out...'); // <--- add this
+    //         await axios.get(`${server}/admin/logout`, { withCredentials: true });
+    //     } catch (err) {
+    //         console.error('Logout error:', err);
+    //     }
+    //     localStorage.removeItem('Admin-Token');
+    //     localStorage.removeItem('token-expiration');
+    //     if (!expired) toast.success('Logged out successfully');
+    //     navigate('/admin');
+    // };
+
+    const handleLogout = async (isExpired = false) => {
+            try {
+                // Call the backend logout API to clear any server-side session
+                await axios.get(`${server}/admin/logout`, { withCredentials: true });
+    
+                // Remove token from localStorage and cookies
+                localStorage.removeItem("Admin-Token");
+                localStorage.removeItem("token-expiration");
+    
+                // Only show "Logged out successfully" if it's not a session expiration
+                if (!isExpired) {
+                    toast.success("Logged out successfully");
+                }
+    
+                // Redirect to login
+                navigate("/admin");
+            } catch (error) {
+                console.error("Error logging out:", error);
+                toast.error("Failed to log out. Please try again.");
+            }
+        };
 
     return (
         <div className="flex h-screen bg-gray-100">

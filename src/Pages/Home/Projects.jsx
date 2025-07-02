@@ -7,10 +7,10 @@ import { FiArrowRight } from "react-icons/fi";
 
 import project1 from "../../assets/Projects/project1.png";
 import project2 from "../../assets/Projects/project2.png";
-import project3 from "../../assets/Projects/project3.png";
+import project6 from "../../assets/Projects/project3.png";
 import project4 from "../../assets/Projects/project7.png";
 import project5 from "../../assets/Projects/project8.png";
-import project6 from "../../assets/Projects/project9.png";
+import project10 from "../../assets/Projects/project10.png";
 
 
 const containerVariants = {
@@ -48,10 +48,10 @@ const projects = [
   },
   {
     id: 3,
-    title: "E‑Commerce Platform",
+    title: "BloodBuck Ecommerce",
     description: "High‑perf online store.",
-    image: project3,
-    link: "https://quantumasync.onrender.com/",
+    image: project10,
+    // link: "https://quantumasync.onrender.com/",
     tags: ["React.js","Express.js", "Node.js","MongoDB"],
   },
   {
@@ -72,10 +72,10 @@ const projects = [
   },
   {
     id: 6,
-    title: "Admin Panel",
-    description: "E‑commerce admin console for managing products, orders, and customers, providing a comprehensive solution for e‑commerce businesses.",
+    title: "Dapper Daddy",
+    description: "E‑commerce Store.",
     image: project6,
-    link: "https://fem-cartel.vercel.app/admin/dashboard",
+    link: "https://quantumasync.onrender.com/",
     tags: ["React.js","Express.js", "Node.js","MongoDB"],
   },
 ];
