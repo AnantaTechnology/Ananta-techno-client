@@ -1,14 +1,14 @@
-import { useState} from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     FaTimes,
     FaTachometerAlt,
     FaBlog,
-    // FaSignOutAlt,
+    FaSignOutAlt,
 } from 'react-icons/fa';
-// import axios from 'axios';
-// import toast from 'react-hot-toast';
-// import { server } from '../../server';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { server } from '../../server';
 
 const navSections = [
     {
@@ -27,35 +27,35 @@ const navSections = [
 
 const AdminLayout = ({ children }) => {
     const [open, setOpen] = useState(false);
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
 
     // Auto-logout
-    // useEffect(() => {
-    //     const checkExpiry = () => {
-    //         const exp = localStorage.getItem('token-expiration');
-    //         if (exp && Date.now() >= +exp) {
-    //             toast.error('Session expired. Logging out.');
-    //             handleLogout(true);
-    //         }
-    //     };
-    //     checkExpiry();
-    //     const id = setInterval(checkExpiry, 30000);
-    //     return () => clearInterval(id);
-    // }, []);
+    useEffect(() => {
+        const checkExpiry = () => {
+            const exp = localStorage.getItem('token-expiration');
+            if (exp && Date.now() >= +exp) {
+                toast.error('Session expired. Logging out.');
+                handleLogout(true);
+            }
+        };
+        checkExpiry();
+        const id = setInterval(checkExpiry, 30000);
+        return () => clearInterval(id);
+    }, []);
 
-    // const handleLogout = async (expired = false) => {
-    //     try {
-    //         console.log('Logging out...'); // <--- add this
-    //         await axios.get(`${server}/admin/logout`, { withCredentials: true });
-    //     } catch (err) {
-    //         console.error('Logout error:', err);
-    //     }
-    //     localStorage.removeItem('Admin-Token');
-    //     localStorage.removeItem('token-expiration');
-    //     if (!expired) toast.success('Logged out successfully');
-    //     navigate('/admin');
-    // };
+    const handleLogout = async (expired = false) => {
+        try {
+            console.log('Logging out...'); // <--- add this
+            await axios.get(`${server}/admin/logout`, { withCredentials: true });
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
+        localStorage.removeItem('Admin-Token');
+        localStorage.removeItem('token-expiration');
+        if (!expired) toast.success('Logged out successfully');
+        navigate('/admin');
+    };
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -98,14 +98,14 @@ const AdminLayout = ({ children }) => {
                         </div>
                     ))}
                 </nav>
-                {/* <div className="absolute bottom-0 w-full px-4 pb-6">
+                <div className="absolute bottom-0 w-full px-4 pb-6">
                     <button
                         onClick={() => handleLogout(false)}
                         className="w-full flex items-center px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white transition-colors"
                     >
                         <FaSignOutAlt className="mr-3 text-lg" /> Logout
                     </button>
-                </div> */}
+                </div>
             </aside>
 
             {/* Overlay for mobile */}

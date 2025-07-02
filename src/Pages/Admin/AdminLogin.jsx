@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import Cookies from 'js-cookie';
 import { server } from '../../server';
 
 const AdminLogin = () => {
@@ -12,18 +11,10 @@ const AdminLogin = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // Redirect if already logged in
-    useEffect(() => {
-        const token = localStorage.getItem("Admin-Token") || Cookies.get("Admin-Token");
-        if (token) {
-            navigate("/admin/dashboard");
-        }
-    }, [navigate]);
-
     const logout = () => {
         localStorage.removeItem("Admin-Token");
         localStorage.removeItem("token-expiration");
-        Cookies.remove("Admin-Token");
+        // toast.success("Logged out successfully");
         navigate("/admin");
     };
 
@@ -31,46 +22,32 @@ const AdminLogin = () => {
         e.preventDefault();
         setLoading(true);
 
-        if (!secretKey.trim()) {
-            toast.error("Secret key is required");
-            setLoading(false);
-            return;
-        }
-
         try {
-            const { data } = await axios.post(
-                `${server}/admin/verify`,
-                { secretKey },
-                { withCredentials: true }
-            );
+            const { data } = await axios.post(`${server}/admin/verify`, { secretKey }, { withCredentials: true });
 
             if (data.success) {
-                // Token valid for 10 minutes
-                const expiresInMs = 10 * 60 * 1000;
-                const expirationTime = Date.now() + expiresInMs;
+                const expirationTime = new Date().getTime() + 10 * 24 * 60 * 60 * 1000;// Token expires in 30days
+                // Store token and expiration time in both cookies and localStorage
 
-                // Store token
-                Cookies.set("Admin-Token", data.token, { expires: expiresInMs / (24 * 60 * 60 * 1000) });
-                localStorage.setItem("Admin-Token", data.token);
-                localStorage.setItem("token-expiration", expirationTime.toString());
+                localStorage.setItem("Admin-Token", expirationTime);
+                localStorage.setItem("token-expiration", expirationTime);
 
-                toast.success("Login successful! Welcome Admin.");
+                toast.success("Login successful, Welcome Admin!");
                 navigate("/admin/dashboard");
 
-                // Auto-logout
-                setTimeout(logout, expiresInMs);
-            } else {
-                toast.error(data.message || "Login failed");
+                // Set a timeout to log the user out when the token expires
+                setTimeout(logout, expirationTime - new Date().getTime());
             }
-        } catch (err) {
-            console.error("Login error:", err);
-            toast.error(err.response?.data?.message || "Invalid Admin Key");
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Invalid Admin Key");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleTogglePassword = () => setShowPassword(prev => !prev);
+    const handleTogglePassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-700 p-4">
