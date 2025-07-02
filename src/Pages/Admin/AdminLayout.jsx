@@ -30,54 +30,54 @@ const AdminLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Auto-logout
+
+
     useEffect(() => {
-        const checkExpiry = () => {
-            const exp = localStorage.getItem('token-expiration');
-            if (exp && Date.now() >= +exp) {
-                toast.error('Session expired. Logging out.');
-                handleLogout(true);
+        const checkTokenExpiration = () => {
+            const expirationTime = localStorage.getItem("token-expiration");
+            const currentTime = new Date().getTime();
+
+            // If token is expired
+            if (expirationTime && currentTime >= expirationTime) {
+                toast.error("Your session has expired. Please log in again.");
+                logout(true); // Pass true to avoid the "Logged out successfully" message
             }
         };
-        checkExpiry();
-        const id = setInterval(checkExpiry, 30000);
-        return () => clearInterval(id);
-    }, []);
 
-    // const handleLogout = async (expired = false) => {
-    //     try {
-    //         console.log('Logging out...'); // <--- add this
-    //         await axios.get(`${server}/admin/logout`, { withCredentials: true });
-    //     } catch (err) {
-    //         console.error('Logout error:', err);
-    //     }
-    //     localStorage.removeItem('Admin-Token');
-    //     localStorage.removeItem('token-expiration');
-    //     if (!expired) toast.success('Logged out successfully');
-    //     navigate('/admin');
-    // };
+        // Check expiration immediately when the component mounts
+        checkTokenExpiration();
 
-    const handleLogout = async (isExpired = false) => {
-            try {
-                // Call the backend logout API to clear any server-side session
-                await axios.get(`${server}/admin/logout`, { withCredentials: true });
-    
-                // Remove token from localStorage and cookies
-                localStorage.removeItem("Admin-Token");
-                localStorage.removeItem("token-expiration");
-    
-                // Only show "Logged out successfully" if it's not a session expiration
-                if (!isExpired) {
-                    toast.success("Logged out successfully");
-                }
-    
-                // Redirect to login
-                navigate("/admin");
-            } catch (error) {
-                console.error("Error logging out:", error);
-                toast.error("Failed to log out. Please try again.");
-            }
+        // Check every 30 seconds for token expiration without refresh
+        const intervalId = setInterval(checkTokenExpiration, 30000); // Adjust the interval as needed
+
+        // Clear the interval when the component unmounts
+        return () => {
+            clearInterval(intervalId);
         };
+    }, [navigate]);
+
+
+    const logout = async (isExpired = false) => {
+        try {
+            // Call the backend logout API to clear any server-side session
+            await axios.get(`${server}/admin/logout`, { withCredentials: true });
+
+            // Remove token from localStorage and cookies
+            localStorage.removeItem("Admin-Token");
+            localStorage.removeItem("token-expiration");
+
+            // Only show "Logged out successfully" if it's not a session expiration
+            if (!isExpired) {
+                toast.success("Logged out successfully");
+            }
+
+            // Redirect to login
+            navigate("/admin");
+        } catch (error) {
+            console.error("Error logging out:", error);
+            toast.error("Failed to log out. Please try again.");
+        }
+    };
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -122,7 +122,7 @@ const AdminLayout = ({ children }) => {
                 </nav>
                 <div className="absolute bottom-0 w-full px-4 pb-6">
                     <button
-                        onClick={() => handleLogout(false)}
+                        onClick={() => logout(false)}
                         className="w-full flex items-center px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white transition-colors"
                     >
                         <FaSignOutAlt className="mr-3 text-lg" /> Logout
